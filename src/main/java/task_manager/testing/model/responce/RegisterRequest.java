@@ -1,4 +1,4 @@
-package com.managingCardsOfBank.model.responce;
+package task_manager.testing.model.responce;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

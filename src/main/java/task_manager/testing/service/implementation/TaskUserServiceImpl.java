@@ -11,7 +11,7 @@ import task_manager.testing.mapper.TaskMapper;
 import task_manager.testing.model.TaskDto;
 import task_manager.testing.repositories.TaskRepository;
 import task_manager.testing.repositories.UserRepository;
-import task_manager.testing.service.TaskService;
+import task_manager.testing.service.TaskUserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,7 +21,7 @@ import static java.util.Objects.isNull;
 
 @Service
 @RequiredArgsConstructor
-public class TaskServiceImpl implements TaskService {
+public class TaskUserServiceImpl implements TaskUserService {
 
     public static final String USER_NO_EXIST = "Пользователь не найден";
     public static final String TASK_EXIST = "Задача с таким именем существует";

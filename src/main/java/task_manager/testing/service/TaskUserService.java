@@ -4,7 +4,7 @@ import task_manager.testing.model.TaskDto;
 
 import java.util.List;
 
-public interface TaskService {
+public interface TaskUserService {
     void createTask(TaskDto taskDto,String email);
 
     void updateTask(TaskDto taskDto, String email);
