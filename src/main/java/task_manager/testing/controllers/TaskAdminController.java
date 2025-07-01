@@ -21,12 +21,12 @@ public class TaskAdminController {
     private final TaskAdminService taskService;
 
     @PostMapping(CREATE_ADMIN_TASK)
-    public void createTask(@RequestBody TaskDto taskDto, @RequestParam Integer userId){
-        taskService.createTaskForUser(taskDto, userId);
+    public TaskDto createTask(@RequestBody TaskDto taskDto, @RequestParam Integer userId){
+       return taskService.createTaskForUser(taskDto, userId);
     }
     @PostMapping(UPDATE_ADMIN_TASK)
-    public void updateTask(@RequestBody TaskDto taskDto, @RequestParam Integer userId){
-        taskService.updateUserTask(taskDto,userId);
+    public TaskDto updateTask(@RequestBody TaskDto taskDto, @RequestParam Integer userId){
+        return taskService.updateUserTask(taskDto,userId);
     }
     @PostMapping(DELETE_ADMIN_TASK)
     public void deleteTask(@RequestBody TaskDto taskDto, @RequestParam Integer userId){
