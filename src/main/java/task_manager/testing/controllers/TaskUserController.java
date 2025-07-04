@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import task_manager.testing.model.CommentsDto;
+
 import task_manager.testing.model.TaskDto;
 import task_manager.testing.service.TaskUserService;
 
@@ -36,5 +38,9 @@ public class TaskUserController {
     @GetMapping(SHOW_TASK)
     public  List<TaskDto> showTasks(Authentication jwtauth){
         return taskService.showAllTasks(jwtauth.getName());
+    }
+    @GetMapping("/show_comments")
+    public List<CommentsDto> showComments (@RequestParam String taskName){
+       return taskService.showTasksComments(taskName);
     }
 }

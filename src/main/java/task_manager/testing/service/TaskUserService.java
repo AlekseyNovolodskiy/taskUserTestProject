@@ -1,5 +1,6 @@
 package task_manager.testing.service;
 
+import task_manager.testing.model.CommentsDto;
 import task_manager.testing.model.TaskDto;
 
 import java.util.List;
@@ -12,5 +13,7 @@ public interface TaskUserService {
     void deleteTask(TaskDto taskDto, String email);
 
     List<TaskDto> showAllTasks(String email);
+
+    List<CommentsDto> showTasksComments(String taskName);
 
 }

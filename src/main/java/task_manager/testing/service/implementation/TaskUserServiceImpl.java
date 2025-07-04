@@ -3,12 +3,15 @@ package task_manager.testing.service.implementation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import task_manager.testing.entity.CommentsEntity;
 import task_manager.testing.entity.TaskEntity;
 import task_manager.testing.entity.UserEntity;
 import task_manager.testing.exeption.TaskException;
 import task_manager.testing.exeption.UserException;
 import task_manager.testing.mapper.TaskMapper;
+import task_manager.testing.model.CommentsDto;
 import task_manager.testing.model.TaskDto;
+import task_manager.testing.repositories.CommentsRepository;
 import task_manager.testing.repositories.TaskRepository;
 import task_manager.testing.repositories.UserRepository;
 import task_manager.testing.service.TaskUserService;
@@ -30,6 +33,7 @@ public class TaskUserServiceImpl implements TaskUserService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final TaskMapper mapper;
+    private final CommentsRepository commentsRepository;
 
     @Override
     public void createTask(TaskDto taskDto, String email) {
@@ -43,6 +47,8 @@ public class TaskUserServiceImpl implements TaskUserService {
             taskEntity.setCreationAT(LocalDateTime.now());
             taskEntity.setTaskDescription(taskDto.getTaskDescription());
             taskEntity.setTaskName(taskDto.getTaskName());
+            taskEntity.setPriority(taskDto.getPriority());
+            taskEntity.setStatus(taskDto.getStatus());
             taskEntity.setExpiredAT(taskDto.getExpiredAT());
             taskEntity.setUser(userEntitiesByEmail);
             taskRepository.save(taskEntity);
@@ -62,6 +68,8 @@ public class TaskUserServiceImpl implements TaskUserService {
             byTaskName.setTaskDescription(taskDto.getTaskDescription());
             byTaskName.setTaskName(taskDto.getTaskName());
             byTaskName.setExpiredAT(taskDto.getExpiredAT());
+            byTaskName.setStatus(taskDto.getStatus());
+            byTaskName.setPriority(taskDto.getPriority());
         }
     }
 
@@ -84,4 +92,14 @@ public class TaskUserServiceImpl implements TaskUserService {
 
         return mapper.taskEntityToTaskDto(taskListByUserId);
     }
+
+    @Override
+    public List<CommentsDto> showTasksComments(String taskName) {
+
+        TaskEntity taskEntity = taskRepository.findByTaskName(taskName)
+                .orElseThrow(() -> new TaskException(TASK_NO_EXIST));
+
+        return mapper.commentsEntityToCommentsDto(commentsRepository.findByTask(taskEntity));
+    }
+
 }
