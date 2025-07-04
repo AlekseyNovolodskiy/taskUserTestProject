@@ -9,4 +9,6 @@ public class TaskDto {
     private String taskName;
     private String taskDescription;
     private LocalDateTime expiredAT;
+    private TaskStatus status;
+    private TaskPriority priority;
 }

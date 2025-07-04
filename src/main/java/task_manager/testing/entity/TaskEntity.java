@@ -2,8 +2,11 @@ package task_manager.testing.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import task_manager.testing.model.TaskPriority;
+import task_manager.testing.model.TaskStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -19,8 +22,15 @@ public class TaskEntity {
     private String taskDescription;
     private LocalDateTime creationAT;
     private LocalDateTime expiredAT;
+    @Enumerated(EnumType.STRING)
+    private TaskPriority priority;
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status;
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable=false)
     private UserEntity user;
+
+    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<CommentsEntity> comments;
 }

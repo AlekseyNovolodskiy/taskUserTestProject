@@ -7,5 +7,7 @@
 
     <include file="/db/changeset/V1__create_user_info.sql"/>
     <include file="/db/changeset/V2__create_task_info.sql"/>
+    <include file="/db/changeset/V3__create_comments_info.sql"/>
+    <include file="/db/changeset/V3__insert_comments_info.sql"/>
 
 </databaseChangeLog>

@@ -9,7 +9,10 @@ import java.util.Optional;
 
 public interface TaskRepository extends JpaRepository<TaskEntity,Long> {
 
-    TaskEntity findByTaskName(String taskName);
+    Optional<TaskEntity> findByTaskName(String taskName);
+
+    @Query(value = "select t from TaskEntity t where t.taskName = :taskName")
+    TaskEntity findTaskEntitiesWithOutOptional(String taskName);
 
     @Query(value = "select t from TaskEntity t where t.user.id = :userId")
     List<TaskEntity> findTaskListByUserId (Long userId);

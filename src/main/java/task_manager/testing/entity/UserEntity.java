@@ -24,6 +24,7 @@ public class UserEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_infoSequence")
     @Column(name = "id", nullable = false)
     private Long id;
+    @Column(name = "user_name")
     private String userName;
     private String email;
     private String password;
@@ -33,6 +34,9 @@ public class UserEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<TaskEntity> user;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<CommentsEntity> comments;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -25,6 +25,7 @@ public class TaskUserServiceImpl implements TaskUserService {
 
     public static final String USER_NO_EXIST = "Пользователь не найден";
     public static final String TASK_EXIST = "Задача с таким именем существует";
+    public static final String TASK_NO_EXIST = "Задача с таким именем не существует";
 
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
@@ -32,10 +33,12 @@ public class TaskUserServiceImpl implements TaskUserService {
 
     @Override
     public void createTask(TaskDto taskDto, String email) {
-        TaskEntity byTaskName = taskRepository.findByTaskName(taskDto.getTaskName());
-        UserEntity userEntitiesByEmail = userRepository.findUserEntitiesByEmail(email).orElseThrow(() -> new UserException(USER_NO_EXIST));
 
-        if (isNull(byTaskName)) {
+        boolean byTaskName = taskRepository.findByTaskName(taskDto.getTaskName()).isPresent();
+        UserEntity userEntitiesByEmail = userRepository.findUserEntitiesByEmail(email)
+                .orElseThrow(() -> new UserException(USER_NO_EXIST));
+
+        if (!byTaskName) {
             TaskEntity taskEntity = new TaskEntity();
             taskEntity.setCreationAT(LocalDateTime.now());
             taskEntity.setTaskDescription(taskDto.getTaskDescription());
@@ -52,7 +55,8 @@ public class TaskUserServiceImpl implements TaskUserService {
     @Override
     public void updateTask(TaskDto taskDto, String email) {
 
-        TaskEntity byTaskName = taskRepository.findByTaskName(taskDto.getTaskName());
+        TaskEntity byTaskName = taskRepository.findByTaskName(taskDto.getTaskName())
+                .orElseThrow(() -> new TaskException(TASK_NO_EXIST));
 
         if (!isNull(byTaskName) && userRepository.existsByEmail(email)) {
             byTaskName.setTaskDescription(taskDto.getTaskDescription());
@@ -64,7 +68,8 @@ public class TaskUserServiceImpl implements TaskUserService {
     @Override
     public void deleteTask(TaskDto taskDto, String email) {
 
-        TaskEntity byTaskName = taskRepository.findByTaskName(taskDto.getTaskName());
+        TaskEntity byTaskName = taskRepository.findByTaskName(taskDto.getTaskName())
+                .orElseThrow(()->new TaskException(TASK_NO_EXIST));
 
         if (!isNull(byTaskName) && userRepository.existsByEmail(email)) {
             taskRepository.delete(byTaskName);
