@@ -1,5 +1,6 @@
 package task_manager.testing.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,8 @@ import static task_manager.testing.controllers.ControllerConstant.TASK_CONTROLLE
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(TASK_CONTROLLER_HEAD)
+@Tag(name = "Поле для авторизации в системе"
+        , description = "'adminemail/password' для  доступа ADMIN и 'useremail/password' для  доступа User ")
 public class UserController {
 
     private final UserService authService;

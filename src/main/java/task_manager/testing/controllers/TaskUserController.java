@@ -33,8 +33,8 @@ public class TaskUserController {
         return taskService.showAllTasks(jwtauth.getName());
     }
     @GetMapping(SHOW_COMMENTS)
-    public List<CommentsDto> showComments (@RequestParam String taskName){
-       return taskService.showTasksComments(taskName);
+    public List<CommentsDto> showComments (@RequestParam String taskName, Authentication jwtauth){
+       return taskService.showTasksComments(taskName,jwtauth.getName());
     }
     @GetMapping(LEAVE_COMMENTS)
     public void leaveComments (@RequestParam String taskName, @RequestParam String comment, Authentication jwtauth){

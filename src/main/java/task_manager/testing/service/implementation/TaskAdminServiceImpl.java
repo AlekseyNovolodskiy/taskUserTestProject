@@ -31,11 +31,11 @@ public class TaskAdminServiceImpl implements TaskAdminService {
     private final TaskMapper mapper;
 
     @Override
-    public TaskDto createTaskForUser(TaskDto taskDto, Integer userId) {
+    public TaskDto createTaskForUser(TaskDto taskDto) {
 
         boolean present = taskRepository.findByTaskName(taskDto.getTaskName()).isPresent();
 
-        UserEntity userEntitiesById = userRepository.findById(Long.valueOf(userId))
+        UserEntity userEntitiesByAuthor = userRepository.findByUserName(taskDto.getAuthor())
                 .orElseThrow(() -> new UserException(USER_NO_EXIST));
 
         TaskEntity taskEntity = new TaskEntity();
@@ -45,8 +45,8 @@ public class TaskAdminServiceImpl implements TaskAdminService {
             taskEntity.setTaskDescription(taskDto.getTaskDescription());
             taskEntity.setTaskName(taskDto.getTaskName());
             taskEntity.setExpiredAT(taskDto.getExpiredAT());
-            taskEntity.setUser(userEntitiesById);
-            taskEntity.setAuthor(userEntitiesById.getUsername());
+            taskEntity.setUser(userEntitiesByAuthor);
+            taskEntity.setAuthor(taskDto.getAuthor());
             taskEntity.setPriority(taskDto.getPriority());
             taskEntity.setStatus(taskDto.getStatus());
             taskRepository.save(taskEntity);
@@ -59,11 +59,14 @@ public class TaskAdminServiceImpl implements TaskAdminService {
     }
 
     @Override
-    public String deleteUserTask(TaskDto taskDto, Integer userId) {
+    public String deleteUserTask(TaskDto taskDto) {
 
         TaskEntity taskEntitiesWithOutOptional = taskRepository.findTaskEntitiesWithOutOptional(taskDto.getTaskName());
 
-        if (!isNull(taskEntitiesWithOutOptional)&& userRepository.existsById(Long.valueOf(userId))) {
+        UserEntity userEntitiesByAuthor = userRepository.findByUserName(taskDto.getAuthor())
+                .orElseThrow(() -> new UserException(USER_NO_EXIST));
+
+        if (!isNull(taskEntitiesWithOutOptional)&& userRepository.existsById(userEntitiesByAuthor.getId())) {
             taskRepository.delete(taskEntitiesWithOutOptional);
         }
         else {
@@ -74,11 +77,14 @@ public class TaskAdminServiceImpl implements TaskAdminService {
 
     @Override
     @Transactional
-    public TaskDto updateUserTask(TaskDto taskDto, Integer userId) {
+    public TaskDto updateUserTask(TaskDto taskDto) {
 
         TaskEntity taskEntitiesWithOutOptional = taskRepository.findTaskEntitiesWithOutOptional(taskDto.getTaskName());
 
-        if (!isNull(taskEntitiesWithOutOptional) && userRepository.existsById(Long.valueOf(userId))) {
+        UserEntity userEntitiesByAuthor = userRepository.findByUserName(taskDto.getAuthor())
+                .orElseThrow(() -> new UserException(USER_NO_EXIST));
+
+        if (!isNull(taskEntitiesWithOutOptional) && userRepository.existsById(userEntitiesByAuthor.getId())) {
             taskEntitiesWithOutOptional.setTaskDescription(taskDto.getTaskDescription());
             taskEntitiesWithOutOptional.setTaskName(taskDto.getTaskName());
             taskEntitiesWithOutOptional.setExpiredAT(taskDto.getExpiredAT());

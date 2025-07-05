@@ -19,6 +19,7 @@ import task_manager.testing.service.TaskUserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 import static java.util.Objects.isNull;
@@ -30,6 +31,7 @@ public class TaskUserServiceImpl implements TaskUserService {
     public static final String USER_NO_EXIST = "Пользователь не найден";
     public static final String TASK_EXIST = "Задача с таким именем существует";
     public static final String TASK_NO_EXIST = "Задача с таким именем не существует";
+    public static final String NOT_ACCESS = "Вы не имеете доступа к данной задаче";
 
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
@@ -43,10 +45,15 @@ public class TaskUserServiceImpl implements TaskUserService {
 
         TaskEntity byTaskName = taskRepository.findByTaskName(taskDto.getTaskName())
                 .orElseThrow(() -> new TaskException(TASK_NO_EXIST));
+       UserEntity userEntitiesByEmail = userRepository.findUserEntitiesByEmail(email)
+               .orElseThrow(() -> new UserException(USER_NO_EXIST));
 
-        if (!isNull(byTaskName) && userRepository.existsByEmail(email)) {
-            byTaskName.setStatus(taskDto.getStatus());
+        if(!byTaskName.getAuthor().equals(userEntitiesByEmail.getNameOfUser())){
+            throw new UserException(NOT_ACCESS);
         }
+
+            byTaskName.setStatus(taskDto.getStatus());
+
     }
 
 
@@ -60,10 +67,16 @@ public class TaskUserServiceImpl implements TaskUserService {
     }
 
     @Override
-    public List<CommentsDto> showTasksComments(String taskName) {
+    public List<CommentsDto> showTasksComments(String taskName,String email) {
 
         TaskEntity taskEntity = taskRepository.findByTaskName(taskName)
                 .orElseThrow(() -> new TaskException(TASK_NO_EXIST));
+        UserEntity userEntitiesByEmail = userRepository.findUserEntitiesByEmail(email)
+                .orElseThrow(() -> new UserException(USER_NO_EXIST));
+
+        if(!taskEntity.getAuthor().equals(userEntitiesByEmail.getNameOfUser())){
+            throw new UserException(NOT_ACCESS);
+        }
 
         return mapper.commentsEntityToCommentsDto(commentsRepository.findByTask(taskEntity));
     }
@@ -73,6 +86,10 @@ public class TaskUserServiceImpl implements TaskUserService {
         UserEntity userEntity = userRepository.findUserEntitiesByEmail(name).orElseThrow(() -> new UserException(USER_NO_EXIST));
         TaskEntity taskEntity = taskRepository.findByTaskName(taskName)
                 .orElseThrow(() -> new TaskException(TASK_NO_EXIST));
+
+        if(!taskEntity.getAuthor().equals(userEntity.getNameOfUser())){
+            throw new UserException(NOT_ACCESS);
+        }
         CommentsEntity commentsEntity = new CommentsEntity();
 
         String actualComment = userEntity.getRole()+" "+userEntity.getUsername()+" leave comment: " +comment;

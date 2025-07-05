@@ -12,7 +12,7 @@ public interface TaskUserService {
 
     List<TaskDto> showAllTasks(String email);
 
-    List<CommentsDto> showTasksComments(String taskName);
+    List<CommentsDto> showTasksComments(String taskName, String email);
 
     void leaveTasksComments(String taskName,String comment, String name);
 }
