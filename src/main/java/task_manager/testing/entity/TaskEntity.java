@@ -22,6 +22,7 @@ public class TaskEntity {
     private String taskDescription;
     private LocalDateTime creationAT;
     private LocalDateTime expiredAT;
+    private String author;
     @Enumerated(EnumType.STRING)
     private TaskPriority priority;
     @Enumerated(EnumType.STRING)

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import task_manager.testing.model.CommentsDto;
 
 import task_manager.testing.model.TaskDto;
+import task_manager.testing.model.TaskUserDto;
 import task_manager.testing.service.TaskUserService;
 
 import java.util.List;
@@ -23,24 +24,20 @@ public class TaskUserController {
 
     private final TaskUserService taskService;
 
-    @PostMapping(CREATE_TASK)
-    public void createTask(@RequestBody TaskDto taskDto, Authentication jwtauth){
-        taskService.createTask(taskDto, jwtauth.getName());
-    }
     @PostMapping(UPDATE_TASK)
-    public void updateTask(@RequestBody TaskDto taskDto, Authentication jwtauth){
+    public void updateTask(@RequestBody TaskUserDto taskDto, Authentication jwtauth){
         taskService.updateTask(taskDto,jwtauth.getName());
-    }
-    @PostMapping(DELETE_TASK)
-    public void deleteTask(@RequestBody TaskDto taskDto, Authentication jwtauth){
-        taskService.deleteTask(taskDto,jwtauth.getName());
     }
     @GetMapping(SHOW_TASK)
     public  List<TaskDto> showTasks(Authentication jwtauth){
         return taskService.showAllTasks(jwtauth.getName());
     }
-    @GetMapping("/show_comments")
+    @GetMapping(SHOW_COMMENTS)
     public List<CommentsDto> showComments (@RequestParam String taskName){
        return taskService.showTasksComments(taskName);
+    }
+    @GetMapping(LEAVE_COMMENTS)
+    public void leaveComments (@RequestParam String taskName, @RequestParam String comment, Authentication jwtauth){
+        taskService.leaveTasksComments(taskName,comment,jwtauth.getName());
     }
 }

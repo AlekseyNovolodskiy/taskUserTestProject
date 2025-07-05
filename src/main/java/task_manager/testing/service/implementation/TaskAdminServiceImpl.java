@@ -3,12 +3,14 @@ package task_manager.testing.service.implementation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import task_manager.testing.entity.CommentsEntity;
 import task_manager.testing.entity.TaskEntity;
 import task_manager.testing.entity.UserEntity;
 import task_manager.testing.exeption.TaskException;
 import task_manager.testing.exeption.UserException;
 import task_manager.testing.mapper.TaskMapper;
 import task_manager.testing.model.TaskDto;
+import task_manager.testing.repositories.CommentsRepository;
 import task_manager.testing.repositories.TaskRepository;
 import task_manager.testing.repositories.UserRepository;
 import task_manager.testing.service.TaskAdminService;
@@ -25,6 +27,7 @@ public class TaskAdminServiceImpl implements TaskAdminService {
 
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final CommentsRepository commentsRepository;
     private final TaskMapper mapper;
 
     @Override
@@ -43,6 +46,9 @@ public class TaskAdminServiceImpl implements TaskAdminService {
             taskEntity.setTaskName(taskDto.getTaskName());
             taskEntity.setExpiredAT(taskDto.getExpiredAT());
             taskEntity.setUser(userEntitiesById);
+            taskEntity.setAuthor(userEntitiesById.getUsername());
+            taskEntity.setPriority(taskDto.getPriority());
+            taskEntity.setStatus(taskDto.getStatus());
             taskRepository.save(taskEntity);
 
         }else {
@@ -76,6 +82,9 @@ public class TaskAdminServiceImpl implements TaskAdminService {
             taskEntitiesWithOutOptional.setTaskDescription(taskDto.getTaskDescription());
             taskEntitiesWithOutOptional.setTaskName(taskDto.getTaskName());
             taskEntitiesWithOutOptional.setExpiredAT(taskDto.getExpiredAT());
+            taskEntitiesWithOutOptional.setAuthor(taskDto.getAuthor());
+            taskEntitiesWithOutOptional.setStatus(taskDto.getStatus());
+            taskEntitiesWithOutOptional.setPriority(taskDto.getPriority());
         }
         else {
             throw new TaskException(TASK_NO_EXIST);
@@ -90,5 +99,22 @@ public class TaskAdminServiceImpl implements TaskAdminService {
         List<TaskEntity> allTaskList = taskRepository.findAll();
 
         return mapper.taskEntityToTaskDto(allTaskList);
+    }
+
+    @Override
+    public void leaveAdminTasksComments(String taskName, String comment, String name) {
+
+        UserEntity userEntity = userRepository.findUserEntitiesByEmail(name).orElseThrow(() -> new UserException(USER_NO_EXIST));
+
+        TaskEntity taskEntity = taskRepository.findByTaskName(taskName)
+                .orElseThrow(() -> new TaskException(TASK_NO_EXIST));
+
+        CommentsEntity commentsEntity = new CommentsEntity();
+
+        String actualComment = userEntity.getRole()+" "+userEntity.getUsername()+" leave comment: " +comment;
+        commentsEntity.setComment(actualComment);
+        commentsEntity.setTask(taskEntity);
+        commentsEntity.setUser(userEntity);
+        commentsRepository.save(commentsEntity);
     }
 }

@@ -11,5 +11,5 @@ create sequence comments_info_sequence start 5 increment 1;
 insert into comments_info(id, comment, user_id, task_id)
 values (1, 'comment1', 2, 1),
        (2, 'comments2', 3, 2),
-       (3, 'comments2', 2, 1),
-       (4, 'comments2', 3, 2)
+       (3, 'comments3', 2, 1),
+       (4, 'comments4', 3, 2)

@@ -11,6 +11,7 @@ import task_manager.testing.exeption.UserException;
 import task_manager.testing.mapper.TaskMapper;
 import task_manager.testing.model.CommentsDto;
 import task_manager.testing.model.TaskDto;
+import task_manager.testing.model.TaskUserDto;
 import task_manager.testing.repositories.CommentsRepository;
 import task_manager.testing.repositories.TaskRepository;
 import task_manager.testing.repositories.UserRepository;
@@ -35,54 +36,19 @@ public class TaskUserServiceImpl implements TaskUserService {
     private final TaskMapper mapper;
     private final CommentsRepository commentsRepository;
 
-    @Override
-    public void createTask(TaskDto taskDto, String email) {
-
-        boolean byTaskName = taskRepository.findByTaskName(taskDto.getTaskName()).isPresent();
-        UserEntity userEntitiesByEmail = userRepository.findUserEntitiesByEmail(email)
-                .orElseThrow(() -> new UserException(USER_NO_EXIST));
-
-        if (!byTaskName) {
-            TaskEntity taskEntity = new TaskEntity();
-            taskEntity.setCreationAT(LocalDateTime.now());
-            taskEntity.setTaskDescription(taskDto.getTaskDescription());
-            taskEntity.setTaskName(taskDto.getTaskName());
-            taskEntity.setPriority(taskDto.getPriority());
-            taskEntity.setStatus(taskDto.getStatus());
-            taskEntity.setExpiredAT(taskDto.getExpiredAT());
-            taskEntity.setUser(userEntitiesByEmail);
-            taskRepository.save(taskEntity);
-        } else {
-            throw new TaskException(TASK_EXIST);
-        }
-    }
 
     @Transactional
     @Override
-    public void updateTask(TaskDto taskDto, String email) {
+    public void updateTask(TaskUserDto taskDto, String email) {
 
         TaskEntity byTaskName = taskRepository.findByTaskName(taskDto.getTaskName())
                 .orElseThrow(() -> new TaskException(TASK_NO_EXIST));
 
         if (!isNull(byTaskName) && userRepository.existsByEmail(email)) {
-            byTaskName.setTaskDescription(taskDto.getTaskDescription());
-            byTaskName.setTaskName(taskDto.getTaskName());
-            byTaskName.setExpiredAT(taskDto.getExpiredAT());
             byTaskName.setStatus(taskDto.getStatus());
-            byTaskName.setPriority(taskDto.getPriority());
         }
     }
 
-    @Override
-    public void deleteTask(TaskDto taskDto, String email) {
-
-        TaskEntity byTaskName = taskRepository.findByTaskName(taskDto.getTaskName())
-                .orElseThrow(()->new TaskException(TASK_NO_EXIST));
-
-        if (!isNull(byTaskName) && userRepository.existsByEmail(email)) {
-            taskRepository.delete(byTaskName);
-        }
-    }
 
     @Override
     public List<TaskDto> showAllTasks(String email) {
@@ -100,6 +66,20 @@ public class TaskUserServiceImpl implements TaskUserService {
                 .orElseThrow(() -> new TaskException(TASK_NO_EXIST));
 
         return mapper.commentsEntityToCommentsDto(commentsRepository.findByTask(taskEntity));
+    }
+
+    @Override
+    public void leaveTasksComments(String taskName,String comment, String name) {
+        UserEntity userEntity = userRepository.findUserEntitiesByEmail(name).orElseThrow(() -> new UserException(USER_NO_EXIST));
+        TaskEntity taskEntity = taskRepository.findByTaskName(taskName)
+                .orElseThrow(() -> new TaskException(TASK_NO_EXIST));
+        CommentsEntity commentsEntity = new CommentsEntity();
+
+        String actualComment = userEntity.getRole()+" "+userEntity.getUsername()+" leave comment: " +comment;
+        commentsEntity.setComment(actualComment);
+        commentsEntity.setTask(taskEntity);
+        commentsEntity.setUser(userEntity);
+        commentsRepository.save(commentsEntity);
     }
 
 }

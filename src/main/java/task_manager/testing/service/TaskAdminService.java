@@ -11,4 +11,5 @@ public interface TaskAdminService{
     TaskDto updateUserTask(TaskDto taskDto, Integer UserId);
     List<TaskDto> showAllTask();
 
+    void leaveAdminTasksComments(String taskName, String comment, String name);
 }
