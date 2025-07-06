@@ -19,5 +19,5 @@ public class TaskDto {
     @NotNull
     private TaskPriority priority;
     @NotNull
-    private String author;
+    private String executor;
 }

@@ -24,16 +24,16 @@ public class TaskAdminController {
     private final TaskAdminService taskService;
 
     @PostMapping(CREATE_ADMIN_TASK)
-    public TaskDto createTask(@RequestBody TaskDto taskDto){
-       return taskService.createTaskForUser(taskDto);
+    public TaskDto createTask(@RequestBody TaskDto taskDto,Authentication jwtAuth){
+       return taskService.createTaskForUser(taskDto,jwtAuth.getName());
     }
     @PostMapping(UPDATE_ADMIN_TASK)
-    public TaskDto updateTask(@RequestBody TaskDto taskDto){
-        return taskService.updateUserTask(taskDto);
+    public TaskDto updateTask(@RequestBody TaskDto taskDto,Authentication jwtAuth){
+        return taskService.updateUserTask(taskDto,jwtAuth.getName());
     }
     @PostMapping(DELETE_ADMIN_TASK)
-    public void deleteTask(@RequestBody TaskDto taskDto){
-        taskService.deleteUserTask(taskDto);
+    public void deleteTask(@RequestBody TaskDto taskDto,Authentication jwtAuth){
+        taskService.deleteUserTask(taskDto,jwtAuth.getName());
     }
 
     @Operation(summary = "просмотр всех задач")

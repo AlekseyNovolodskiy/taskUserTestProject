@@ -48,7 +48,7 @@ public class TaskUserServiceImpl implements TaskUserService {
        UserEntity userEntitiesByEmail = userRepository.findUserEntitiesByEmail(email)
                .orElseThrow(() -> new UserException(USER_NO_EXIST));
 
-        if(!byTaskName.getAuthor().equals(userEntitiesByEmail.getNameOfUser())){
+        if(!byTaskName.getUser().getId().equals(userEntitiesByEmail.getId())){
             throw new UserException(NOT_ACCESS);
         }
 
@@ -74,7 +74,7 @@ public class TaskUserServiceImpl implements TaskUserService {
         UserEntity userEntitiesByEmail = userRepository.findUserEntitiesByEmail(email)
                 .orElseThrow(() -> new UserException(USER_NO_EXIST));
 
-        if(!taskEntity.getAuthor().equals(userEntitiesByEmail.getNameOfUser())){
+        if(!taskEntity.getUser().getId().equals(userEntitiesByEmail.getId())){
             throw new UserException(NOT_ACCESS);
         }
 
@@ -87,12 +87,12 @@ public class TaskUserServiceImpl implements TaskUserService {
         TaskEntity taskEntity = taskRepository.findByTaskName(taskName)
                 .orElseThrow(() -> new TaskException(TASK_NO_EXIST));
 
-        if(!taskEntity.getAuthor().equals(userEntity.getNameOfUser())){
+        if(!taskEntity.getUser().getId().equals(userEntity.getId())){
             throw new UserException(NOT_ACCESS);
         }
         CommentsEntity commentsEntity = new CommentsEntity();
 
-        String actualComment = userEntity.getRole()+" "+userEntity.getUsername()+" leave comment: " +comment;
+        String actualComment = userEntity.getRole()+" "+userEntity.getNameOfUser()+" leave comment: " +comment;
         commentsEntity.setComment(actualComment);
         commentsEntity.setTask(taskEntity);
         commentsEntity.setUser(userEntity);

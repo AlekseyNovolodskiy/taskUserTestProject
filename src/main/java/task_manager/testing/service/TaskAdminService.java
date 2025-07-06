@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface TaskAdminService{
 
-    TaskDto createTaskForUser (TaskDto taskDto);
-    String deleteUserTask(TaskDto taskDto);
-    TaskDto updateUserTask(TaskDto taskDto);
+    TaskDto createTaskForUser (TaskDto taskDto, String email);
+    String deleteUserTask(TaskDto taskDto, String email);
+    TaskDto updateUserTask(TaskDto taskDto, String email);
     List<TaskDto> showAllTask();
 
     void leaveAdminTasksComments(String taskName, String comment, String name);

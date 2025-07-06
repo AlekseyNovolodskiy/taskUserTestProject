@@ -17,6 +17,7 @@ import task_manager.testing.service.TaskAdminService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.isNull;
 import static task_manager.testing.service.implementation.TaskUserServiceImpl.*;
@@ -31,11 +32,15 @@ public class TaskAdminServiceImpl implements TaskAdminService {
     private final TaskMapper mapper;
 
     @Override
-    public TaskDto createTaskForUser(TaskDto taskDto) {
+    public TaskDto createTaskForUser(TaskDto taskDto, String email) {
+
 
         boolean present = taskRepository.findByTaskName(taskDto.getTaskName()).isPresent();
 
-        UserEntity userEntitiesByAuthor = userRepository.findByUserName(taskDto.getAuthor())
+        UserEntity byUserName = userRepository.findByUserName(taskDto.getExecutor())
+                .orElseThrow(() -> new UserException(USER_NO_EXIST));
+
+        UserEntity userEntitiesByAuthor = userRepository.findUserEntitiesByEmail(email)
                 .orElseThrow(() -> new UserException(USER_NO_EXIST));
 
         TaskEntity taskEntity = new TaskEntity();
@@ -45,8 +50,8 @@ public class TaskAdminServiceImpl implements TaskAdminService {
             taskEntity.setTaskDescription(taskDto.getTaskDescription());
             taskEntity.setTaskName(taskDto.getTaskName());
             taskEntity.setExpiredAT(taskDto.getExpiredAT());
-            taskEntity.setUser(userEntitiesByAuthor);
-            taskEntity.setAuthor(taskDto.getAuthor());
+            taskEntity.setUser(byUserName);
+            taskEntity.setAuthor(userEntitiesByAuthor.getNameOfUser());
             taskEntity.setPriority(taskDto.getPriority());
             taskEntity.setStatus(taskDto.getStatus());
             taskRepository.save(taskEntity);
@@ -59,11 +64,11 @@ public class TaskAdminServiceImpl implements TaskAdminService {
     }
 
     @Override
-    public String deleteUserTask(TaskDto taskDto) {
+    public String deleteUserTask(TaskDto taskDto, String email) {
 
         TaskEntity taskEntitiesWithOutOptional = taskRepository.findTaskEntitiesWithOutOptional(taskDto.getTaskName());
 
-        UserEntity userEntitiesByAuthor = userRepository.findByUserName(taskDto.getAuthor())
+        UserEntity userEntitiesByAuthor = userRepository.findUserEntitiesByEmail(email)
                 .orElseThrow(() -> new UserException(USER_NO_EXIST));
 
         if (!isNull(taskEntitiesWithOutOptional)&& userRepository.existsById(userEntitiesByAuthor.getId())) {
@@ -77,18 +82,22 @@ public class TaskAdminServiceImpl implements TaskAdminService {
 
     @Override
     @Transactional
-    public TaskDto updateUserTask(TaskDto taskDto) {
+    public TaskDto updateUserTask(TaskDto taskDto, String email) {
+
+        UserEntity byUserName = userRepository.findByUserName(taskDto.getExecutor())
+                .orElseThrow(() -> new UserException(USER_NO_EXIST));
 
         TaskEntity taskEntitiesWithOutOptional = taskRepository.findTaskEntitiesWithOutOptional(taskDto.getTaskName());
 
-        UserEntity userEntitiesByAuthor = userRepository.findByUserName(taskDto.getAuthor())
+        UserEntity userEntitiesByAuthor = userRepository.findUserEntitiesByEmail(email)
                 .orElseThrow(() -> new UserException(USER_NO_EXIST));
 
         if (!isNull(taskEntitiesWithOutOptional) && userRepository.existsById(userEntitiesByAuthor.getId())) {
+            taskEntitiesWithOutOptional.setUser(byUserName);
             taskEntitiesWithOutOptional.setTaskDescription(taskDto.getTaskDescription());
             taskEntitiesWithOutOptional.setTaskName(taskDto.getTaskName());
             taskEntitiesWithOutOptional.setExpiredAT(taskDto.getExpiredAT());
-            taskEntitiesWithOutOptional.setAuthor(taskDto.getAuthor());
+            taskEntitiesWithOutOptional.setAuthor(userEntitiesByAuthor.getNameOfUser());
             taskEntitiesWithOutOptional.setStatus(taskDto.getStatus());
             taskEntitiesWithOutOptional.setPriority(taskDto.getPriority());
         }
@@ -117,7 +126,7 @@ public class TaskAdminServiceImpl implements TaskAdminService {
 
         CommentsEntity commentsEntity = new CommentsEntity();
 
-        String actualComment = userEntity.getRole()+" "+userEntity.getUsername()+" leave comment: " +comment;
+        String actualComment = userEntity.getRole()+" "+userEntity.getNameOfUser()+" leave comment: " +comment;
         commentsEntity.setComment(actualComment);
         commentsEntity.setTask(taskEntity);
         commentsEntity.setUser(userEntity);
